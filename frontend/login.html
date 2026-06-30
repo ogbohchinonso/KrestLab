@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log in — KrestLab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body class="auth-page">
+
+  <div class="auth-card">
+    <a href="index.html" class="auth-brand">
+      <span class="topbar__logo">⬡</span>
+      <span class="topbar__name">KrestLab</span>
+    </a>
+    <h1 class="auth-title">Welcome back</h1>
+    <p  class="auth-sub">Log in to access your snippets and AI tutor.</p>
+
+    <div class="alert hidden" id="alertBox"></div>
+
+    <div class="auth-form" id="loginForm">
+      <label class="field-label">Email</label>
+      <input class="field-input" id="email" type="email" placeholder="you@example.com" autocomplete="email" />
+
+      <label class="field-label">Password</label>
+      <input class="field-input" id="password" type="password" placeholder="••••••••" autocomplete="current-password" />
+
+      <button class="btn btn--accent w-full" id="btnLogin">Log in</button>
+    </div>
+
+    <p class="auth-footer">Don't have an account? <a href="register.html">Sign up free</a></p>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (Auth.getToken()) window.location.href = 'index.html';
+
+    document.getElementById('btnLogin').addEventListener('click', async () => {
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const alert    = document.getElementById('alertBox');
+      const btn      = document.getElementById('btnLogin');
+
+      if (!email || !password) return showAlert('Please fill in all fields.');
+
+      btn.disabled    = true;
+      btn.textContent = 'Logging in…';
+
+      try {
+        await Auth.login(email, password);
+        window.location.href = 'index.html';
+      } catch (err) {
+        showAlert(err.message);
+        btn.disabled    = false;
+        btn.textContent = 'Log in';
+      }
+    });
+
+    document.getElementById('password').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('btnLogin').click();
+    });
+
+    function showAlert(msg) {
+      const el = document.getElementById('alertBox');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

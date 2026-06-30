@@ -1,0 +1,142 @@
+.dash-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dash-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.dash-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  background: var(--bg-bar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+  gap: 8px;
+}
+
+.dash-nav { display: flex; flex-direction: column; gap: 4px; }
+
+.dash-nav-item {
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.dash-nav-item:hover  { background: var(--border); color: var(--text-1); }
+.dash-nav-item.active { background: var(--accent-glow); color: var(--accent); }
+
+.dash-xp {
+  margin-top: auto;
+  background: var(--bg-pane);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 12px;
+  text-align: center;
+}
+.xp-label { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-3); }
+.xp-value { font-size: 28px; font-weight: 700; color: var(--accent); font-family: var(--font-mono); }
+.xp-level { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+
+.dash-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--bg-base);
+}
+
+.dash-tab        { display: none; }
+.dash-tab.active { display: block; }
+
+.dash-tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.dash-tab-header h2 { font-size: 18px; font-weight: 700; }
+
+.loading-text { color: var(--text-3); font-size: 13px; }
+
+/* Snippet grid */
+.snippet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.snippet-card {
+  background: var(--bg-pane);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color .15s;
+  cursor: pointer;
+}
+.snippet-card:hover { border-color: var(--accent-dim); }
+
+.snippet-card__lang {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+.snippet-card__title { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.snippet-card__meta  { font-size: 11px; color: var(--text-3); margin-top: auto; }
+.snippet-card__tags  { display: flex; gap: 4px; flex-wrap: wrap; }
+.tag-chip {
+  background: var(--border); color: var(--text-2);
+  font-size: 10px; padding: 2px 7px; border-radius: 99px;
+}
+
+/* Curriculum list */
+.curriculum-list { display: flex; flex-direction: column; gap: 12px; }
+
+.curriculum-card {
+  background: var(--bg-pane);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: border-color .15s;
+  cursor: pointer;
+}
+.curriculum-card:hover { border-color: var(--accent-dim); }
+
+.curriculum-card__info { flex: 1; }
+.curriculum-card__topic  { font-size: 14px; font-weight: 700; color: var(--text-1); }
+.curriculum-card__lang   { font-size: 11px; color: var(--text-2); font-family: var(--font-mono); }
+.curriculum-card__bar    { margin-top: 8px; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.curriculum-card__fill   { height: 100%; background: var(--accent); border-radius: 99px; }
+.curriculum-card__status {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 99px;
+}
+.status--active    { background: rgba(34,197,94,0.1);  color: var(--green); }
+.status--completed { background: var(--accent-glow);   color: var(--accent); }
+.status--paused    { background: rgba(245,158,11,0.1); color: var(--yellow); }
+
+/* Profile form */
+.profile-form { display: flex; flex-direction: column; gap: 12px; max-width: 420px; }
+.profile-divider { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+.profile-section-title { font-size: 14px; font-weight: 700; color: var(--text-1); }

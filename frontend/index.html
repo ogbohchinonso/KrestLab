@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KrestLab — Browser IDE</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- CodeMirror -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css" />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ── Top Bar ─────────────────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar__left">
+      <a href="index.html" class="topbar__brand">
+        <span class="topbar__logo">⬡</span>
+        <span class="topbar__name">KrestLab</span>
+      </a>
+      <div class="topbar__tabs" id="langTabs">
+        <button class="tab active" data-lang="html">HTML</button>
+        <button class="tab" data-lang="css">CSS</button>
+        <button class="tab" data-lang="js">JS</button>
+        <button class="tab" data-lang="python">Python</button>
+        <button class="tab" data-lang="typescript">TypeScript</button>
+        <button class="tab" data-lang="java">Java</button>
+        <button class="tab" data-lang="cpp">C++</button>
+        <button class="tab" data-lang="rust">Rust</button>
+        <button class="tab" data-lang="go">Go</button>
+        <button class="tab" data-lang="sql">SQL</button>
+      </div>
+    </div>
+
+    <div class="topbar__right">
+      <button class="btn btn--ghost" id="btnTutor" title="Open AI Tutor">🎓 AI Tutor</button>
+      <button class="btn btn--ghost" id="btnSave"  title="Save snippet">Save</button>
+      <button class="btn btn--ghost" id="btnShare" title="Share snippet">Share</button>
+      <button class="btn btn--run"   id="btnRun">▶ Run</button>
+      <!-- Auth buttons — toggled by JS -->
+      <div id="authBtns" class="topbar__auth">
+        <a href="login.html"    class="btn btn--ghost">Log in</a>
+        <a href="register.html" class="btn btn--accent">Sign up</a>
+      </div>
+      <div id="userMenu" class="user-menu hidden">
+        <button class="user-avatar" id="btnUserMenu">
+          <span id="userInitials">?</span>
+        </button>
+        <div class="user-dropdown hidden" id="userDropdown">
+          <a href="dashboard.html">Dashboard</a>
+          <button id="btnLogout">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Main Split Layout ──────────────────────────────────────────────── -->
+  <main class="workspace" id="workspace">
+
+    <!-- Left: Editor -->
+    <div class="pane pane--editor" id="editorPane">
+      <div class="pane__bar">
+        <span class="pane__label" id="editorLabel">HTML</span>
+        <span class="pane__hint" id="execHint"></span>
+        <button class="icon-btn" id="btnClearEditor" title="Clear editor">✕</button>
+        <button class="icon-btn" id="btnCopy"        title="Copy code">⧉</button>
+      </div>
+      <div id="cmEditor"></div>
+    </div>
+
+    <!-- Right: Output -->
+    <div class="pane pane--output" id="outputPane">
+      <div class="output-split" id="outputSplit">
+
+        <div class="pane pane--preview" id="previewPane">
+          <div class="pane__bar">
+            <span class="pane__label">Preview</span>
+            <button class="icon-btn" id="btnRefresh" title="Refresh">↺</button>
+          </div>
+          <iframe id="previewFrame" sandbox="allow-scripts"></iframe>
+          <!-- Non-browser languages show output here -->
+          <div class="exec-output hidden" id="execOutput">
+            <pre id="execOutputPre"></pre>
+          </div>
+        </div>
+
+        <div class="pane pane--console" id="consolePane">
+          <div class="pane__bar">
+            <span class="pane__label">Console</span>
+            <span class="exec-meta hidden" id="execMeta"></span>
+            <button class="icon-btn" id="btnClearConsole" title="Clear console">✕</button>
+          </div>
+          <div class="console-output" id="consoleOutput">
+            <p class="console-hint">Console output appears here…</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- AI Tutor Panel (slides in from right) -->
+    <aside class="tutor-panel hidden" id="tutorPanel">
+      <div class="tutor-header">
+        <span class="tutor-title">🎓 AI Tutor</span>
+        <button class="icon-btn" id="btnCloseTutor">✕</button>
+      </div>
+      <div class="tutor-body" id="tutorBody">
+        <!-- Tutor start screen -->
+        <div class="tutor-start" id="tutorStart">
+          <p class="tutor-intro">Tell me what you want to learn and I'll build a personalised curriculum for you — step by step, with a capstone project.</p>
+          <div class="tutor-form">
+            <input class="tutor-input" id="tutorTopic"    type="text"    placeholder="e.g. Recursion in Python" />
+            <select class="tutor-input" id="tutorLang">
+              <option value="python">Python</option>
+              <option value="javascript">JavaScript</option>
+              <option value="typescript">TypeScript</option>
+              <option value="java">Java</option>
+              <option value="cpp">C++</option>
+              <option value="rust">Rust</option>
+              <option value="go">Go</option>
+              <option value="html">HTML/CSS</option>
+            </select>
+            <button class="btn btn--accent w-full" id="btnGenerateCurriculum">Generate Curriculum</button>
+          </div>
+        </div>
+
+        <!-- Active curriculum view -->
+        <div class="tutor-curriculum hidden" id="tutorCurriculum">
+          <div class="curriculum-header">
+            <div class="curriculum-meta">
+              <span class="curriculum-topic" id="curriculumTopic"></span>
+              <span class="curriculum-progress" id="curriculumProgress"></span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+
+          <div class="step-card" id="stepCard">
+            <div class="step-number" id="stepNumber"></div>
+            <h3 class="step-title" id="stepTitle"></h3>
+            <p  class="step-objective" id="stepObjective"></p>
+            <div class="step-explanation" id="stepExplanation"></div>
+            <button class="btn btn--ghost w-full" id="btnLoadStarter">Load Starter Code</button>
+          </div>
+
+          <div class="tutor-actions">
+            <button class="btn btn--ghost" id="btnHint">💡 Hint</button>
+            <button class="btn btn--ghost" id="btnReview">✅ Review my code</button>
+            <button class="btn btn--accent" id="btnNextStep">Next Step →</button>
+          </div>
+
+          <div class="tutor-response" id="tutorResponse"></div>
+
+          <div class="tutor-chat">
+            <input  class="tutor-input" id="tutorQuestion" type="text" placeholder="Ask a question…" />
+            <button class="btn btn--ghost w-full" id="btnAskTutor">Ask</button>
+          </div>
+        </div>
+
+        <!-- Loading state -->
+        <div class="tutor-loading hidden" id="tutorLoading">
+          <div class="spinner"></div>
+          <p id="tutorLoadingMsg">Generating your curriculum…</p>
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- Save Snippet Modal -->
+  <div class="modal-overlay hidden" id="saveModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Save Snippet</h2>
+        <button class="icon-btn" id="btnCloseSaveModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <label class="field-label">Title</label>
+        <input  class="field-input" id="snippetTitle"  type="text" placeholder="My awesome snippet" />
+        <label class="field-label">Tags (comma separated)</label>
+        <input  class="field-input" id="snippetTags"   type="text" placeholder="python, loops, beginner" />
+        <label class="field-label field-check">
+          <input type="checkbox" id="snippetPublic" />
+          Make public (visible to community)
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn--ghost"  id="btnCancelSave">Cancel</button>
+        <button class="btn btn--accent" id="btnConfirmSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Modal -->
+  <div class="modal-overlay hidden" id="shareModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Share Snippet</h2>
+        <button class="icon-btn" id="btnCloseShareModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">Anyone with this link can view your snippet.</p>
+        <div class="share-link-row">
+          <input class="field-input" id="shareLinkInput" type="text" readonly />
+          <button class="btn btn--accent" id="btnCopyLink">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- CodeMirror -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/rust/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/go/go.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/console.js"></script>
+  <script src="js/runner.js"></script>
+  <script src="js/tutor.js"></script>
+  <script src="js/snippets.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
