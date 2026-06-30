@@ -145,7 +145,7 @@ Visit `http://localhost:3000` (or wherever you served the frontend). Register an
 
 ## Monetization hooks already wired (not yet enforced)
 
-Per your direction, **all languages and the AI tutor are free** right now. The codebase still has the scaffolding ready for when you want to monetize differently:
+**All languages and the AI tutor are free** right now. The codebase still has the scaffolding ready for when you want to monetize differently:
 
 - `User.usage.executions` tracks every execution per user (visible in dashboard later)
 - Stripe SDK is installed and `.env` has placeholder keys — no checkout flow built yet
